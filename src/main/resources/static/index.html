@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FeatureFlagLite Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f6fb;
+            color: #1f2937;
+        }
+
+        /* HEADER */
+
+        header {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+            padding: 25px 50px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            color: #e0e7ff;
+        }
+
+        /* MAIN CONTAINER */
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* CARD */
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #111827;
+        }
+
+        .card-description {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            padding: 11px 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        /* BUTTON */
+
+        button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        /* MESSAGES */
+
+        .success {
+            margin-top: 15px;
+            padding: 12px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 7px;
+            display: none;
+        }
+
+        .error {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 7px;
+            display: none;
+        }
+
+        /* DASHBOARD CONTROLS */
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .environment-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        /* FEATURE CARDS */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #2563eb;
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        /* STATUS */
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-on {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-off {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* FEATURE INFORMATION */
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #6b7280;
+        }
+
+        .value {
+            font-weight: bold;
+        }
+
+        /* MESSAGE */
+
+        .message {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            color: #6b7280;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        /* CHANGE LOG */
+
+        .change-log-wrapper {
+            margin-top: 20px;
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .change-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .change-log-table th {
+            background: #f8fafc;
+            color: #374151;
+            padding: 13px 12px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .change-log-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .change-log-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .change-log-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .environment-tag {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 15px;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .admin-tag {
+            background: #f3e8ff;
+            color: #7e22ce;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .state-change {
+            font-weight: bold;
+        }
+
+        .rollout-change {
+            font-weight: bold;
+        }
+
+        .arrow {
+            color: #6b7280;
+            margin: 0 5px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 30px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            select,
+            button {
+                width: 100%;
+            }
+
+            header {
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<!-- HEADER -->
+
+<header>
+
+    <h1>FeatureFlagLite</h1>
+
+    <p>
+        Feature Flag & Configuration Management System
+    </p>
+
+</header>
+
+
+<div class="container">
+
+
+    <!-- ====================================== -->
+    <!-- CREATE FEATURE FLAG -->
+    <!-- ====================================== -->
+
+    <div class="card">
+
+        <h2>
+            Create Feature Flag
+        </h2>
+
+        <p class="card-description">
+            Create a new feature flag for your application.
+        </p>
+
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="flagName">
+                    Feature Name
+                </label>
+
+                <input
+                        type="text"
+                        id="flagName"
+                        placeholder="Example: paymentFeature">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="application">
+                    Application
+                </label>
+
+                <input
+                        type="text"
+                        id="application"
+                        value="FeatureFlagLite">
+
+            </div>
+
+
+            <div class="form-group full">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <input
+                        type="text"
+                        id="description"
+                        placeholder="Enter feature description">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="defaultState">
+                    Default State
+                </label>
+
+                <select id="defaultState">
+
+                    <option value="OFF">
+                        OFF
+                    </option>
+
+                    <option value="ON">
+                        ON
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <button onclick="createFeatureFlag()">
+            Create Feature Flag
+        </button>
+
+
+        <div
+                id="createSuccess"
+                class="success">
+        </div>
+
+
+        <div
+                id="createError"
+                class="error">
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================== -->
+    <!-- CHANGE FEATURE FLAG STATE -->
+    <!-- ====================================== -->
+
+    <div class="card">
+
+        <h2>
+            Change Feature Flag State
+        </h2>
+
+        <p class="card-description">
+            Change the state and rollout percentage
+            of a feature for a selected environment.
+        </p>
+
+
+        <div class="form-grid">
+
+
+            <!-- FEATURE FLAG -->
+
+            <div class="form-group">
+
+                <label for="flagSelect">
+                    Feature Flag
+                </label>
+
+                <select id="flagSelect">
+
+                    <option value="">
+                        Select Feature Flag
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ENVIRONMENT -->
+
+            <div class="form-group">
+
+                <label for="stateEnvironment">
+                    Environment
+                </label>
+
+                <select id="stateEnvironment">
+
+                    <option value="1">
+                        DEV
+                    </option>
+
+                    <option value="2">
+                        TEST
+                    </option>
+
+                    <option value="3">
+                        PROD
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- STATE -->
+
+            <div class="form-group">
+
+                <label for="flagState">
+                    State
+                </label>
+
+                <select id="flagState">
+
+                    <option value="ON">
+                        ON
+                    </option>
+
+                    <option value="OFF">
+                        OFF
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ROLLOUT -->
+
+            <div class="form-group">
+
+                <label for="rollout">
+                    Rollout Percentage
+                </label>
+
+                <input
+                        type="number"
+                        id="rollout"
+                        min="0"
+                        max="100"
+                        value="100"
+                        placeholder="0 - 100">
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <button onclick="updateFlagState()">
+            Update Flag State
+        </button>
+
+
+        <div
+                id="stateSuccess"
+                class="success">
+        </div>
+
+
+        <div
+                id="stateError"
+                class="error">
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================== -->
+    <!-- ENVIRONMENT DASHBOARD -->
+    <!-- ====================================== -->
+
+    <div class="card">
+
+        <h2>
+            Feature Flag Dashboard
+        </h2>
+
+        <p class="card-description">
+            Monitor feature flags and rollout configurations
+            for different environments.
+        </p>
+
+
+        <div class="controls">
+
+            <select id="environment">
+
+                <option value="DEV">
+                    DEV
+                </option>
+
+                <option value="TEST">
+                    TEST
+                </option>
+
+                <option value="PROD">
+                    PROD
+                </option>
+
+            </select>
+
+
+            <button onclick="loadFlags()">
+                Check Feature Flags
+            </button>
+
+        </div>
+
+
+        <div
+                id="environmentBadge"
+                class="environment-badge">
+
+            Environment: DEV
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================== -->
+    <!-- FEATURE FLAGS -->
+    <!-- ====================================== -->
+
+    <div
+            id="features"
+            class="features">
+
+        <div class="message">
+
+            Select an environment and click
+            "Check Feature Flags".
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================== -->
+    <!-- CHANGE LOG -->
+    <!-- ====================================== -->
+
+    <div class="card">
+
+        <h2>
+            Change Log
+        </h2>
+
+        <p class="card-description">
+
+            View the history of feature flag changes,
+            including state, rollout percentage,
+            user and time.
+
+        </p>
+
+
+        <button onclick="loadChangeLogs()">
+
+            View Change History
+
+        </button>
+
+
+        <div
+                id="changeLogs"
+                style="margin-top: 20px;">
+
+            <div class="message">
+
+                Click "View Change History"
+                to load the change log.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    FeatureFlagLite © 2026 | Spring Boot + MySQL
+
+</footer>
+
+
+
+<script>
+
+
+    // ==========================================
+    // UPDATE ENVIRONMENT BADGE
+    // ==========================================
+
+    document
+        .getElementById("environment")
+        .addEventListener(
+            "change",
+            function () {
+
+                document
+                    .getElementById(
+                        "environmentBadge"
+                    )
+                    .textContent =
+                    "Environment: " +
+                    this.value;
+
+            }
+        );
+
+
+
+    // ==========================================
+    // LOAD FEATURE FLAGS
+    // FOR DROPDOWN
+    // ==========================================
+
+    async function loadFeatureFlagsForDropdown() {
+
+        const flagSelect =
+            document.getElementById(
+                "flagSelect"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/feature-flags"
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load feature flags"
+                );
+
+            }
+
+
+            const flags =
+                await response.json();
+
+
+            flagSelect.innerHTML =
+                `
+                <option value="">
+                    Select Feature Flag
+                </option>
+                `;
+
+
+            flags.forEach(
+                flag => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        flag.id;
+
+
+                    option.textContent =
+                        flag.name;
+
+
+                    flagSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "Error loading feature flags:",
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // ==========================================
+    // CREATE FEATURE FLAG
+    // ==========================================
+
+    async function createFeatureFlag() {
+
+
+        const name =
+            document
+                .getElementById(
+                    "flagName"
+                )
+                .value;
+
+
+        const description =
+            document
+                .getElementById(
+                    "description"
+                )
+                .value;
+
+
+        const defaultState =
+            document
+                .getElementById(
+                    "defaultState"
+                )
+                .value;
+
+
+        const application =
+            document
+                .getElementById(
+                    "application"
+                )
+                .value;
+
+
+        const successMessage =
+            document.getElementById(
+                "createSuccess"
+            );
+
+
+        const errorMessage =
+            document.getElementById(
+                "createError"
+            );
+
+
+        successMessage.style.display =
+            "none";
+
+
+        errorMessage.style.display =
+            "none";
+
+
+        if (
+            name.trim() === ""
+        ) {
+
+            errorMessage.textContent =
+                "Feature name is required.";
+
+
+            errorMessage.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/api/feature-flags",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                {
+
+                                    name:
+                                    name,
+
+                                    description:
+                                    description,
+
+                                    defaultState:
+                                    defaultState,
+
+                                    application:
+                                    application
+
+                                }
+                            )
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to create feature flag"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            successMessage.textContent =
+                "Feature flag '" +
+                data.name +
+                "' created successfully.";
+
+
+            successMessage.style.display =
+                "block";
+
+
+            document
+                .getElementById(
+                    "flagName"
+                )
+                .value = "";
+
+
+            document
+                .getElementById(
+                    "description"
+                )
+                .value = "";
+
+
+            // Refresh dropdown
+
+            await loadFeatureFlagsForDropdown();
+
+
+        }
+        catch (error) {
+
+            errorMessage.textContent =
+                "Unable to create feature flag.";
+
+
+            errorMessage.style.display =
+                "block";
+
+
+            console.error(error);
+
+        }
+
+    }
+
+
+
+    // ==========================================
+    // UPDATE FLAG STATE
+    // ==========================================
+
+    async function updateFlagState() {
+
+
+        const featureFlagId =
+            document
+                .getElementById(
+                    "flagSelect"
+                )
+                .value;
+
+
+        const environmentId =
+            document
+                .getElementById(
+                    "stateEnvironment"
+                )
+                .value;
+
+
+        const state =
+            document
+                .getElementById(
+                    "flagState"
+                )
+                .value;
+
+
+        const rolloutPercentage =
+            document
+                .getElementById(
+                    "rollout"
+                )
+                .value;
+
+
+        const successMessage =
+            document.getElementById(
+                "stateSuccess"
+            );
+
+
+        const errorMessage =
+            document.getElementById(
+                "stateError"
+            );
+
+
+        successMessage.style.display =
+            "none";
+
+
+        errorMessage.style.display =
+            "none";
+
+
+
+        if (
+            featureFlagId === ""
+        ) {
+
+            errorMessage.textContent =
+                "Please select a feature flag.";
+
+
+            errorMessage.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+
+        if (
+            rolloutPercentage === "" ||
+            rolloutPercentage < 0 ||
+            rolloutPercentage > 100
+        ) {
+
+            errorMessage.textContent =
+                "Rollout percentage must be between 0 and 100.";
+
+
+            errorMessage.style.display =
+                "block";
+
+
+            return;
+
+        }
+
+
+
+        try {
+
+
+            const url =
+                `/api/flag-states?featureFlagId=${featureFlagId}` +
+                `&environmentId=${environmentId}` +
+                `&state=${state}` +
+                `&rolloutPercentage=${rolloutPercentage}`;
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "PUT"
+                    }
+                );
+
+
+            if (!response.ok) {
+
+
+                const errorData =
+                    await response.json();
+
+
+                throw new Error(
+                    errorData.message ||
+                    "Failed to update flag state"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            successMessage.textContent =
+                "Feature flag updated successfully for " +
+                data.environment.name +
+                ".";
+
+
+            successMessage.style.display =
+                "block";
+
+
+            // Refresh dashboard
+
+            await loadFlags();
+
+
+        }
+        catch (error) {
+
+
+            errorMessage.textContent =
+                error.message ||
+                "Unable to update feature flag.";
+
+
+            errorMessage.style.display =
+                "block";
+
+
+            console.error(error);
+
+        }
+
+    }
+
+
+
+    // ==========================================
+    // LOAD FEATURE FLAGS
+    // FOR DASHBOARD
+    // ==========================================
+
+    async function loadFlags() {
+
+
+        const environment =
+            document
+                .getElementById(
+                    "environment"
+                )
+                .value;
+
+
+        const featuresContainer =
+            document.getElementById(
+                "features"
+            );
+
+
+        featuresContainer.innerHTML =
+            `
+            <div class="message">
+                Loading feature flags...
+            </div>
+            `;
+
+
+        const url =
+            `/api/flag-states/runtime?` +
+            `application=FeatureFlagLite` +
+            `&environment=${environment}`;
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    url
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to fetch feature flags"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                data.length === 0
+            ) {
+
+                featuresContainer.innerHTML =
+                    `
+                    <div class="message">
+                        No feature flags found for
+                        ${environment}.
+                    </div>
+                    `;
+
+                return;
+
+            }
+
+
+            let html = "";
+
+
+            data.forEach(
+                flag => {
+
+
+                    const state =
+                        flag.state;
+
+
+                    const statusClass =
+                        state === "ON"
+                            ? "status-on"
+                            : "status-off";
+
+
+                    html += `
+
+                        <div class="feature-card">
+
+                            <h3>
+                                ${flag.featureFlag.name}
+                            </h3>
+
+
+                            <div class="description">
+
+                                ${flag.featureFlag.description || ""}
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="label">
+                                    Status
+                                </span>
+
+                                <span
+                                    class="status ${statusClass}">
+
+                                    ${state}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="label">
+                                    Rollout Percentage
+                                </span>
+
+                                <span class="value">
+
+                                    ${flag.rolloutPercentage}%
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="label">
+                                    Application
+                                </span>
+
+                                <span class="value">
+
+                                    ${flag.featureFlag.application}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-row">
+
+                                <span class="label">
+                                    Default State
+                                </span>
+
+                                <span class="value">
+
+                                    ${flag.featureFlag.defaultState}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+
+            featuresContainer.innerHTML =
+                html;
+
+
+        }
+        catch (error) {
+
+
+            featuresContainer.innerHTML =
+                `
+                <div
+                    class="message"
+                    style="color:#dc2626;">
+
+                    Unable to load feature flags.
+
+                </div>
+                `;
+
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // ==========================================
+    // LOAD CHANGE LOGS
+    // ==========================================
+
+    async function loadChangeLogs() {
+
+
+        const changeLogsContainer =
+            document.getElementById(
+                "changeLogs"
+            );
+
+
+        changeLogsContainer.innerHTML =
+            `
+            <div class="message">
+                Loading change history...
+            </div>
+            `;
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/api/change-logs"
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to load change logs"
+                );
+
+            }
+
+
+            const logs =
+                await response.json();
+
+
+            if (
+                logs.length === 0
+            ) {
+
+                changeLogsContainer.innerHTML =
+                    `
+                    <div class="message">
+                        No change history available.
+                    </div>
+                    `;
+
+                return;
+
+            }
+
+
+            let html = `
+
+                <div class="change-log-wrapper">
+
+                    <table class="change-log-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Feature
+                                </th>
+
+                                <th>
+                                    Environment
+                                </th>
+
+                                <th>
+                                    State Change
+                                </th>
+
+                                <th>
+                                    Rollout Change
+                                </th>
+
+                                <th>
+                                    Changed By
+                                </th>
+
+                                <th>
+                                    Changed At
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+            `;
+
+
+            logs.forEach(
+                log => {
+
+
+                    const oldState =
+                        log.oldState === null
+                            ? "N/A"
+                            : log.oldState;
+
+
+                    const oldRollout =
+                        log.oldRolloutPercentage === null
+                            ? "N/A"
+                            : log.oldRolloutPercentage + "%";
+
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    ${log.featureFlag.name}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="environment-tag">
+
+                                    ${log.environment.name}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="state-change">
+
+                                    ${oldState}
+
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+
+                                <span
+                                    class="state-change">
+
+                                    ${log.newState}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="rollout-change">
+
+                                    ${oldRollout}
+
+                                </span>
+
+                                <span class="arrow">
+                                    →
+                                </span>
+
+                                <span
+                                    class="rollout-change">
+
+                                    ${log.newRolloutPercentage}%
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="admin-tag">
+
+                                    ${log.changedBy}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                ${formatDateTime(
+                        log.changedAt
+                    )}
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            );
+
+
+            html += `
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            `;
+
+
+            changeLogsContainer.innerHTML =
+                html;
+
+
+        }
+        catch (error) {
+
+
+            changeLogsContainer.innerHTML =
+                `
+                <div
+                    class="message"
+                    style="color:#dc2626;">
+
+                    Unable to load change history.
+
+                </div>
+                `;
+
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+
+
+
+    // ==========================================
+    // FORMAT DATE AND TIME
+    // ==========================================
+
+    function formatDateTime(
+        dateTime
+    ) {
+
+
+        if (!dateTime) {
+
+            return "N/A";
+
+        }
+
+
+        const date =
+            new Date(
+                dateTime
+            );
+
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+
+                day: "2-digit",
+
+                month: "short",
+
+                year: "numeric",
+
+                hour: "2-digit",
+
+                minute: "2-digit"
+
+            }
+        );
+
+    }
+
+
+
+    // ==========================================
+    // INITIAL LOAD
+    // ==========================================
+
+    loadFeatureFlagsForDropdown();
+
+</script>
+
+</body>
+</html>
